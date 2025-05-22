@@ -1,0 +1,162 @@
+"use client";
+import { Badge, Input, Select, Table, TableTd, TableTr } from "@mantine/core";
+import { MdDeleteOutline } from "react-icons/md";
+import React, { FC, useEffect, useState } from "react";
+import { MdClear } from "react-icons/md";
+import { apiData } from "../anime/page";
+import { FaChevronLeft } from "react-icons/fa6";
+import { FaChevronRight } from "react-icons/fa6";
+
+export type IData = {
+  data: any[];
+  pagination: {
+    current_page: number;
+    has_next_page: boolean;
+    items: {
+      count: number;
+      total: number;
+      per_page: number;
+    };
+    last_visible_page: number;
+  };
+};
+
+export type IAnimeListProps = {
+  alldata: IData;
+};
+
+const AnimeList: FC<IAnimeListProps> = (props) => {
+  const { alldata } = props;
+  const [allData, setAllData] = useState(alldata);
+  const [data, setData] = useState<string | null>("");
+  const [row, setRow] = useState<string | null>("");
+  const [title, setTitle] = useState("");
+
+  const handleDeleteType = () => {
+    setData("");
+  };
+
+  const handleDeleteTitle = () => {
+    setTitle("");
+  };
+
+  const rows = allData.data?.map((item) => (
+    <TableTr key={item.mal_id}>
+      <TableTd>{item.title}</TableTd>
+      <TableTd>{item.rank}</TableTd>
+      <TableTd>{item.type}</TableTd>
+      <TableTd>
+        {item.status === "Finished Airing" ? (
+          <Badge color="green">Complete</Badge>
+        ) : (
+          <Badge color="blue">{item.status}</Badge>
+        )}
+      </TableTd>
+    </TableTr>
+  ));
+
+  const handleRow = async (value: string | null) => {
+    setRow(value);
+    const res = await apiData(Number(value));
+    setAllData(res);
+  };
+
+  const handleAllDelete = () => {
+    setData("");
+    setTitle("");
+    setAllData(allData);
+  };
+
+  const handleType = async (value: string | null) => {
+    setData(value);
+    const res = await apiData(null, value);
+    setAllData(res);
+  };
+
+  const handleSearchInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  };
+
+  return (
+    <div className="mx-10">
+      <div className="flex items-center">
+        <Select
+          classNames={{ root: "w-1/4 p-10" }}
+          onChange={(value) => handleType(value)}
+          data={[
+            "tv",
+            "movie",
+            "ova",
+            "special",
+            "ona",
+            "music",
+            "cm",
+            "pv",
+            "tv_special",
+          ]}
+        />
+        <Input
+          classNames={{ wrapper: "w-1/2 p-4" }}
+          onChange={(e) => handleSearchInput(e)}
+        />
+      </div>
+
+      <div className="m-6 flex flex-row text-center items-center gap-4">
+        <div className="flex flex-row items-center">
+          <p className="bold text-sm pr-2">Type :</p>
+          <span>{data}</span>
+          {data && (
+            <MdClear
+              className="bg-gray-400 rounded-full ml-2"
+              onClick={handleDeleteType}
+            />
+          )}
+        </div>
+        <div className="">
+          <div className="flex flex-row items-center">
+            <p>Title :</p>
+            <span>{title}</span>
+            {title && (
+              <MdClear
+                className="bg-gray-400 rounded-full ml-2"
+                onClick={handleDeleteTitle}
+              />
+            )}
+          </div>
+        </div>
+
+        <div>
+          <MdDeleteOutline size={22} onClick={handleAllDelete} />
+        </div>
+      </div>
+
+      <div>
+        <Table classNames={{ thead: "text-gray-600 text-base bg-gray-200" }}>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Title</Table.Th>
+              <Table.Th>Rank</Table.Th>
+              <Table.Th>Type</Table.Th>
+              <Table.Th>Status</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
+
+        <div className="p-6 flex flex-row justify-end gap-4 items-center">
+          <Select
+            data={["5", "10", "15", "20"]}
+            onChange={(value) => handleRow(value)}
+            defaultValue={"5"}
+          />
+          <div className="flex flex-row">
+            <FaChevronLeft />
+            <FaChevronRight />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AnimeList;
