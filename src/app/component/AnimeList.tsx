@@ -3,7 +3,7 @@ import { Badge, Input, Select, Table, TableTd, TableTr } from "@mantine/core";
 import { MdDeleteOutline } from "react-icons/md";
 import React, { FC, useEffect, useState } from "react";
 import { MdClear } from "react-icons/md";
-import { apiData } from "../anime/page";
+import { apiData } from "@/app/anime/page";
 import { FaChevronLeft } from "react-icons/fa6";
 import { FaChevronRight } from "react-icons/fa6";
 
@@ -34,7 +34,6 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
   const [currentPage, setCurrentPage] = useState(
     alldata.pagination.current_page
   ); // this is used for set current page...
-
 
   const nextpage = alldata.pagination.has_next_page;
 
