@@ -1,16 +1,20 @@
-import React from "react";
 import AnimeList from "@/app/component/AnimeList";
+import axios from "axios";
 
 export const apiData = async (
   limit?: number | null,
-  filterData?: string | null
+  filterData?: string | null,
+  title?: string | undefined
 ) => {
-  console.log(filterData, "this is filterData");
+  const url = new URL("https://api.jikan.moe/v4/anime");
 
-  const api = `https://api.jikan.moe/v4/anime?limit=${limit}&q={fil}`;
-  const response = await fetch(api);
-  const allData = await response.json();
-  return allData;
+  if (limit) url.searchParams.append("limit", limit.toString());
+  if (filterData) url.searchParams.append("type", filterData);
+  if (title) url.searchParams.append("q", title);
+  // console.log(url, "this is url");
+
+  const response = await axios.get(url.toString());
+  return response.data;
 };
 
 const page = async () => {

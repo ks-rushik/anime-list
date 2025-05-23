@@ -28,16 +28,18 @@ export type IAnimeListProps = {
 const AnimeList: FC<IAnimeListProps> = (props) => {
   const { alldata } = props;
   const [allData, setAllData] = useState(alldata);
-  const [data, setData] = useState<string | null>("");
-  const [row, setRow] = useState<string | null>("");
-  const [title, setTitle] = useState("");
+  const [type, setType] = useState<string | null>(""); // this is type of like tv and other ...
+  const [row, setRow] = useState<string | null>(""); // this is rows like 5 ,10 , 15 ,...
+  const [title, setTitle] = useState(""); // this is search field (input field)...
 
   const handleDeleteType = () => {
-    setData("");
+    setType("");
+    setAllData(alldata);
   };
 
   const handleDeleteTitle = () => {
     setTitle("");
+    setAllData(alldata);
   };
 
   const rows = allData.data?.map((item) => (
@@ -57,24 +59,26 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
 
   const handleRow = async (value: string | null) => {
     setRow(value);
-    const res = await apiData(Number(value));
+    const res = await apiData(Number(value), type);
     setAllData(res);
   };
 
   const handleAllDelete = () => {
-    setData("");
+    setType("");
     setTitle("");
-    setAllData(allData);
+    setAllData(alldata);
   };
 
   const handleType = async (value: string | null) => {
-    setData(value);
-    const res = await apiData(null, value);
+    setType(value);
+    const res = await apiData(Number(row) | 5, value);
     setAllData(res);
   };
 
   const handleSearchInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
+    const res = await apiData(Number(row) | 5, type, title);
+    setAllData(res);
   };
 
   return (
@@ -83,20 +87,23 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
         <Select
           classNames={{ root: "w-1/4 p-10" }}
           onChange={(value) => handleType(value)}
+          value={type}
           data={[
-            "tv",
-            "movie",
-            "ova",
-            "special",
-            "ona",
-            "music",
-            "cm",
-            "pv",
-            "tv_special",
+            { label: "All", value: "" },
+            { label: "Tv", value: "tv" },
+            { label: "Movie", value: "movie" },
+            { label: "Ova", value: "ova" },
+            { label: "Special", value: "special" },
+            { label: "Ona", value: "ona" },
+            { label: "Music", value: "music" },
+            { label: "Cm", value: "cm" },
+            { label: "Pv", value: "pv" },
+            { label: "Tv special", value: "tv_special" },
           ]}
         />
         <Input
           classNames={{ wrapper: "w-1/2 p-4" }}
+          value={title}
           onChange={(e) => handleSearchInput(e)}
         />
       </div>
@@ -104,8 +111,8 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
       <div className="m-6 flex flex-row text-center items-center gap-4">
         <div className="flex flex-row items-center">
           <p className="bold text-sm pr-2">Type :</p>
-          <span>{data}</span>
-          {data && (
+          <span>{type}</span>
+          {type && (
             <MdClear
               className="bg-gray-400 rounded-full ml-2"
               onClick={handleDeleteType}
