@@ -1,10 +1,11 @@
 "use client";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { apiData } from "@/app/anime/page";
 
 import TableData from "@/app/component/TableData";
 import PaginationData from "@/app/component/Pagination";
 import HeaderPage from "@/app/component/HeaderPage";
+import { useDebouncedValue } from "@mantine/hooks";
 
 export type IData = {
   data: {
@@ -38,9 +39,19 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
   const [title, setTitle] = useState(""); // this is search field (input field)...
   const [status, setStatus] = useState<string | null>("");
   const [loading, setLoading] = useState(false);
+  const [debounced] = useDebouncedValue(title, 1000);
+
   const [currentPage, setCurrentPage] = useState(
     alldata.pagination.current_page
   ); // this is used for set current page...
+
+  useEffect(() => {
+    const debouncefunc = async () => {
+      const res = await apiData(Number(row) | 5, type, title);
+      setAllData(res);
+    };
+    debouncefunc();
+  }, [debounced]);
 
   const handlePageChange = async (newPage: number) => {
     const res = await apiData(Number(row) || 5, type, title, newPage);
@@ -87,9 +98,7 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
   const handleSearchInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
     setLoading(true);
-    const res = await apiData(Number(row) | 5, type, title);
     setLoading(false);
-    setAllData(res);
   };
 
   const handleStatus = async (value: string | null) => {
