@@ -31,6 +31,23 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
   const [type, setType] = useState<string | null>(""); // this is type of like tv and other ...
   const [row, setRow] = useState<string | null>(""); // this is rows like 5 ,10 , 15 ,...
   const [title, setTitle] = useState(""); // this is search field (input field)...
+  const [currentPage, setCurrentPage] = useState(
+    alldata.pagination.current_page
+  ); // this is used for set current page...
+
+
+  const nextpage = alldata.pagination.has_next_page;
+
+  const handlePageChange = async (newPage: number) => {
+    const res = await apiData(Number(row) || 5, type, title, newPage);
+    setAllData(res);
+    setCurrentPage(newPage);
+  };
+
+  const startItem =
+    (currentPage - 1) * (allData.pagination.items.per_page || 5) + 1;
+  const endItem = startItem + (allData.pagination.items.count || 0) - 1;
+  const totalPages = allData.pagination.last_visible_page;
 
   const handleDeleteType = () => {
     setType("");
@@ -150,15 +167,29 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
 
-        <div className="p-6 flex flex-row justify-end gap-4 items-center">
+        <div className="p-6 flex flex-row justify-end gap-6 items-center">
           <Select
             data={["5", "10", "15", "20"]}
             onChange={(value) => handleRow(value)}
             defaultValue={"5"}
           />
+          <div>
+            {startItem} - {endItem} of {totalPages}
+          </div>
           <div className="flex flex-row">
-            <FaChevronLeft />
-            <FaChevronRight />
+            <button
+              disabled={currentPage === 1}
+              className="disabled:opacity-50"
+            >
+              <FaChevronLeft
+                onClick={() => handlePageChange(currentPage - 1)}
+              />
+            </button>
+            <button disabled={!nextpage}>
+              <FaChevronRight
+                onClick={() => handlePageChange(currentPage + 1)}
+              />
+            </button>
           </div>
         </div>
       </div>
