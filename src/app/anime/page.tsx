@@ -11,7 +11,6 @@ export const apiData = async (
   if (limit) url.searchParams.append("limit", limit.toString());
   if (filterData) url.searchParams.append("type", filterData);
   if (title) url.searchParams.append("q", title);
-  // console.log(url, "this is url");
 
   const response = await axios.get(url.toString());
   return response.data;
