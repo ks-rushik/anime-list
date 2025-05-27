@@ -2,7 +2,7 @@
 import React, { FC, useState } from "react";
 
 import TableData from "@/app/component/TableData";
-import HeaderPage, { IFilter } from "@/app/component/HeaderPage";
+import FilterFields, { IFilter } from "@/app/component/FilterFields";
 
 export type IData = {
   data: {
@@ -48,7 +48,7 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
 
   return (
     <div className="mx-10">
-      <HeaderPage
+      <FilterFields
         alldata={alldata}
         setAllData={setAllData}
         setLoading={setLoading}

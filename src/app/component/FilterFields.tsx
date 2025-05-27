@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
 import BaseSelect from "@/app/component/ui/BaseSelect";
-import { Input } from "@mantine/core";
 import { IData } from "@/app/component/AnimeList";
 import { FaSearch } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
@@ -8,6 +7,8 @@ import FieldWithValueWrapper from "@/app/component/FieldWithValueWrapper";
 import { useDebouncedValue } from "@mantine/hooks";
 import { apiData } from "@/app/anime/page";
 import BaseInput from "@/app/component/ui/BaseInput";
+import { mediaType } from "@/app/constant/mediaType";
+import { statusType } from "@/app/constant/statusType";
 
 export type IFilter = {
   type: string | null;
@@ -22,7 +23,7 @@ export type IHeaderProps = {
   OnFilter: (filter: IFilter) => void;
 };
 
-const HeaderPage: FC<IHeaderProps> = (props) => {
+const FilterFields: FC<IHeaderProps> = (props) => {
   const { setAllData, alldata, setLoading, row, OnFilter } = props;
   const [type, setType] = useState<string | null>(""); // this is type of like tv and other ...
   const [title, setTitle] = useState(""); // this is search field (input field)...
@@ -107,20 +108,10 @@ const HeaderPage: FC<IHeaderProps> = (props) => {
           onChange={(value) => handleType(value)}
           label="Type"
           value={type}
-          data={[
-            { label: "All", value: "" },
-            { label: "Tv", value: "tv" },
-            { label: "Movie", value: "movie" },
-            { label: "Ova", value: "ova" },
-            { label: "Special", value: "special" },
-            { label: "Ona", value: "ona" },
-            { label: "Music", value: "music" },
-            { label: "Cm", value: "cm" },
-            { label: "Pv", value: "pv" },
-            { label: "Tv special", value: "tv_special" },
-          ]}
+          data={mediaType}
         />
         <BaseInput
+          value={title}
           onChange={(e) => handleSearchInput(e)}
           placeholder="Search Anthing..."
           leftSection={<FaSearch />}
@@ -129,12 +120,7 @@ const HeaderPage: FC<IHeaderProps> = (props) => {
           label="Status"
           value={status}
           onChange={(value) => handleStatus(value)}
-          data={[
-            { label: "All", value: "" },
-            { label: "Airing", value: "airing" },
-            { label: "Completed", value: "complete" },
-            { label: "Upcoming", value: "upcoming" },
-          ]}
+          data={statusType}
         />
       </div>
 
@@ -144,30 +130,35 @@ const HeaderPage: FC<IHeaderProps> = (props) => {
       </div>
 
       <div className="my-6 flex flex-row text-center items-center gap-12">
-        <FieldWithValueWrapper
-          title={"Type"}
-          value={type!}
-          handleDelete={handleDeleteType}
-        />
-        <FieldWithValueWrapper
-          title={"Title"}
-          value={title}
-          handleDelete={handleDeleteTitle}
-        />
-        <FieldWithValueWrapper
-          title={"Status"}
-          value={status!}
-          handleDelete={handleDeleteStatus}
-        />
-
-        {type && status && title && (
+        {type && (
+          <FieldWithValueWrapper
+            title={"Type"}
+            value={type!}
+            handleDelete={handleDeleteType}
+          />
+        )}
+        {title && (
+          <FieldWithValueWrapper
+            title={"Title"}
+            value={title}
+            handleDelete={handleDeleteTitle}
+          />
+        )}
+        {status && (
+          <FieldWithValueWrapper
+            title={"Status"}
+            value={status!}
+            handleDelete={handleDeleteStatus}
+          />
+        )}
+        {type || title || status ? (
           <div>
             <MdDeleteOutline size={22} onClick={handleAllDelete} color="red" />
           </div>
-        )}
+        ) : null}
       </div>
     </>
   );
 };
 
-export default HeaderPage;
+export default FilterFields;
