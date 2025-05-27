@@ -55,13 +55,18 @@ const BaseTable = <T,>({
   pagination,
   ...other
 }: IBaseTableProps<T>) => {
-  const startItem = pagination
-    ? (pagination.currentPage - 1) * data.pagination.items.count
-    : 0;
+  const perPage = data.pagination.items.per_page || 0;
+  const totalItems = data.pagination.items.total || 0;
+  const currentPage = pagination?.currentPage || 1;
 
-  const endItem = startItem + (data.pagination.items.per_page || 0) - 1;
+  const startItem =
+    totalItems === 0
+      ? (currentPage - 1) * perPage
+      : (currentPage - 1) * perPage + 1;
+  const endItem = Math.min(startItem + perPage - 1, totalItems);
 
   const totalPages = data.pagination.last_visible_page;
+  const totalItem = data.pagination.items.total;
 
   return (
     <>
@@ -112,13 +117,23 @@ const BaseTable = <T,>({
           </TableTr>
         </TableThead>
         <TableTbody>
-          {data.data.map((row, index) => (
-            <TableTr key={index}>
-              {columns.map((col, index) => (
-                <TableTd key={index}>{col.render(row)}</TableTd>
-              ))}
+          {data.data.length === 0 ? (
+            <TableTr>
+              <TableTd colSpan={columns.length}>
+                <div className="text-base text-gray-700 flex items-center justify-center py-10">
+                  No data found
+                </div>
+              </TableTd>
             </TableTr>
-          ))}
+          ) : (
+            data.data.map((row, index) => (
+              <TableTr key={index}>
+                {columns.map((col, index) => (
+                  <TableTd key={index}>{col.render(row)}</TableTd>
+                ))}
+              </TableTr>
+            ))
+          )}
         </TableTbody>
       </Table>
       {pagination && (
@@ -129,7 +144,7 @@ const BaseTable = <T,>({
             defaultValue={"5"}
           />
           <div>
-            {startItem} - {endItem} of {totalPages}
+            {startItem} - {endItem} of {totalItem}
           </div>
           <Pagination
             total={totalPages}
@@ -144,4 +159,3 @@ const BaseTable = <T,>({
 };
 
 export default BaseTable;
-//in this how to disable upbutton when items are ascending and also how to disabled downbutton when item are descending order
