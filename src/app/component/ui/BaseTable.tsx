@@ -10,9 +10,11 @@ import {
   TableTr,
 } from "@mantine/core";
 import clsx from "clsx";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import BaseSelect from "@/app/component/ui/BaseSelect";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+
+export type ISort = { column: string; sort: string };
 
 export type IPagination = {
   handleRow: (value: string | null) => Promise<void>;
@@ -23,8 +25,9 @@ export type IColumn<T> = {
   label: string;
   render: (item: T) => ReactNode;
   sortable?: {
-    upFunc: Promise<void>;
-    downFunc: Promise<void>;
+    upFunc: () => void;
+    downFunc: () => void;
+    sortingOrder: ISort;
   };
 };
 
@@ -52,8 +55,6 @@ const BaseTable = <T,>({
   pagination,
   ...other
 }: IBaseTableProps<T>) => {
-  console.log(columns, "this is data ");
-
   const startItem = pagination
     ? (pagination.currentPage - 1) * data.pagination.items.count
     : 0;
@@ -80,17 +81,25 @@ const BaseTable = <T,>({
                     <div className="flex items-center gap-2">
                       <span>{col.label}</span>
                       <div className="flex">
-                        <button className="disabled:opacity-30">
-                          <FaArrowUp
-                            onClick={() => col.sortable?.upFunc}
-                            size={14}
-                          />
+                        <button
+                          className="disabled:opacity-30"
+                          onClick={col.sortable.upFunc}
+                          disabled={
+                            col.label === col.sortable.sortingOrder.column &&
+                            col.sortable.sortingOrder.sort === "asc"
+                          }
+                        >
+                          <FaArrowUp size={14} />
                         </button>
-                        <button className="disabled:opacity-30">
-                          <FaArrowDown
-                            onClick={() => col.sortable?.downFunc}
-                            size={14}
-                          />
+                        <button
+                          className="disabled:opacity-30"
+                          onClick={col.sortable.downFunc}
+                          disabled={
+                            col.label === col.sortable.sortingOrder.column &&
+                            col.sortable.sortingOrder.sort === "desc"
+                          }
+                        >
+                          <FaArrowDown size={14} />
                         </button>
                       </div>
                     </div>
@@ -135,3 +144,4 @@ const BaseTable = <T,>({
 };
 
 export default BaseTable;
+//in this how to disable upbutton when items are ascending and also how to disabled downbutton when item are descending order
