@@ -61,7 +61,6 @@ const BaseTable = <T,>({
   const perPage = data.pagination.items.per_page || 5;
   const totalItems = data.pagination.items.total || 0;
   const currentPage = pagination?.currentPage || 1;
-  console.log(data.pagination, "this is pagination ");
 
   const startItem =
     totalItems === 0
@@ -75,7 +74,6 @@ const BaseTable = <T,>({
   const totalPages = data.pagination.last_visible_page;
 
   const totalItem = data.pagination.items.total;
-  
 
   return (
     <>
