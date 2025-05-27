@@ -22,14 +22,24 @@ export type IHeaderProps = {
   OnFilter: (filter: IFilter) => void;
   setAllData: React.Dispatch<React.SetStateAction<IData>>;
   totalItem: number;
+  currentPage: number | undefined;
 };
 
 const FilterFields: FC<IHeaderProps> = (props) => {
-  const { setAllData, alldata, setLoading, row, OnFilter, totalItem } = props;
+  const {
+    setAllData,
+    alldata,
+    setLoading,
+    row,
+    OnFilter,
+    totalItem,
+    currentPage,
+  } = props;
   const [type, setType] = useState<string | null>(""); // this is type of like tv and other ...
   const [title, setTitle] = useState(""); // this is search field (input field)...
   const [status, setStatus] = useState<string | null>("");
   const [debounced] = useDebouncedValue(title, 1000);
+  
 
   const filterArguments = {
     type: type,
@@ -43,7 +53,7 @@ const FilterFields: FC<IHeaderProps> = (props) => {
   useEffect(() => {
     const debouncefunc = async () => {
       if (debounced.trim() !== "" || debounced === "") {
-        const res = await apiData(Number(row) | 5, type, title ,);
+        const res = await apiData(Number(row) | 5, type, title, currentPage);
         setAllData(res);
       }
     };

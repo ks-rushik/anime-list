@@ -12,7 +12,7 @@ export type ITableProps = {
   type: string | null;
   title: string | undefined;
   loading: boolean;
-  OnRow: (row: string | null) => void;
+  OnRow: (row: string | null, currentPage: number) => void;
   filterValues: IFilter;
 };
 
@@ -41,7 +41,12 @@ const TableData: FC<ITableProps> = (props) => {
 
   const handleRow = async (value: string | null) => {
     setRow(value);
-    const res = await apiData(Number(value), filterValues.type);
+    const res = await apiData(
+      Number(value),
+      filterValues.type,
+      filterValues.title,
+      currentPage
+    );
     setAllData(res);
   };
   const fetchWithOrder = async (
@@ -60,7 +65,7 @@ const TableData: FC<ITableProps> = (props) => {
   };
 
   useEffect(() => {
-    OnRow(row);
+    OnRow(row, currentPage);
   }, [row]);
 
   return (

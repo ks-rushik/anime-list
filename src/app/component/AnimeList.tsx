@@ -38,6 +38,7 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
   });
   const [rowValue, setRowValue] = useState<string | null>("");
   const [loading, setLoading] = useState(false);
+  const [currentPage ,setCurrentPage] = useState<number | undefined>()
 
   const totalItem = allData.pagination.items.total;
 
@@ -45,8 +46,9 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
     setFilterValues(values);
   };
 
-  const handleRow = (row: string | null) => {
+  const handleRow = (row: string | null ,currentPage: number) => {
     setRowValue(row);
+    setCurrentPage(currentPage)
   };
 
   return (
@@ -57,6 +59,7 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
         setAllData={setAllData}
         setLoading={setLoading}
         row={rowValue}
+        currentPage={currentPage}
         OnFilter={handleFilterValues}
       />
       <TableData
