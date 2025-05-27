@@ -30,7 +30,7 @@ const TableData: FC<ITableProps> = (props) => {
 
   const handlePageChange = async (newPage: number) => {
     const res = await apiData(
-      Number(row) || 5,
+      Number(row),
       filterValues.type,
       filterValues.title,
       newPage
@@ -71,6 +71,7 @@ const TableData: FC<ITableProps> = (props) => {
   return (
     <>
       <BaseTable
+        loading={loading}
         data={allData}
         pagination={{
           handleRow,

@@ -53,7 +53,7 @@ const FilterFields: FC<IHeaderProps> = (props) => {
   useEffect(() => {
     const debouncefunc = async () => {
       if (debounced.trim() !== "" || debounced === "") {
-        const res = await apiData(Number(row) | 5, type, title, currentPage);
+        const res = await apiData(Number(row), type, title, currentPage);
         setAllData(res);
       }
     };
