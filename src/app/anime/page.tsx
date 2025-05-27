@@ -1,5 +1,5 @@
 import AnimeList from "@/app/component/AnimeList";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 export const apiData = async (
   limit?: number | null,
@@ -21,8 +21,22 @@ export const apiData = async (
   if (sort) params.sort = sort;
   if (status) params.status = status;
 
-  const response = await axios.get(api, { params });
-  return response.data;
+  try {
+    const response = await axios.get(api, { params });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+
+    if (error instanceof AxiosError) {
+      if (error.code === "ERR_BAD_REQUEST") {
+        throw new Error(
+          "Failed to fetch data from the API, there might be wrong api"
+        );
+      } else {
+        throw new Error("An unexpected error occurred");
+      }
+    }
+  }
 };
 
 const page = async () => {
