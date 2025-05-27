@@ -55,7 +55,7 @@ const BaseTable = <T,>({
   pagination,
   ...other
 }: IBaseTableProps<T>) => {
-  const perPage = data.pagination.items.per_page || 0;
+  const perPage = data.pagination.items.per_page || 5;
   const totalItems = data.pagination.items.total || 0;
   const currentPage = pagination?.currentPage || 1;
 
@@ -63,9 +63,13 @@ const BaseTable = <T,>({
     totalItems === 0
       ? (currentPage - 1) * perPage
       : (currentPage - 1) * perPage + 1;
-  const endItem = Math.min(startItem + perPage - 1, totalItems);
+  const endItem = Math.min(
+    startItem === 0 ? 0 : startItem + (data.pagination.items.count || 0) - 1,
+    totalItems
+  );
 
   const totalPages = data.pagination.last_visible_page;
+
   const totalItem = data.pagination.items.total;
 
   return (
