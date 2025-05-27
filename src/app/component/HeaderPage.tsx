@@ -1,40 +1,104 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import BaseSelect from "@/app/component/ui/BaseSelect";
 import { Input } from "@mantine/core";
 import { IData } from "@/app/component/AnimeList";
 import { FaSearch } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import FieldWithValueWrapper from "@/app/component/FieldWithValueWrapper";
+import { useDebouncedValue } from "@mantine/hooks";
+import { apiData } from "@/app/anime/page";
+import BaseInput from "@/app/component/ui/BaseInput";
 
-export type IHeaderProps = {
-  handleType: (value: string | null) => Promise<void>;
-  handleStatus: (value: string | null) => Promise<void>;
+export type IFilter = {
   type: string | null;
   title: string;
-  allData: IData;
-  handleSearchInput: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  status: string | null;
-  handleDeleteTitle: () => void;
-  handleDeleteType: () => void;
-  handleDeleteStatus: () => void;
-  handleAllDelete: () => void;
+};
+
+export type IHeaderProps = {
+  alldata: IData;
+  setAllData: React.Dispatch<React.SetStateAction<IData>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  row: string | null;
+  OnFilter: (filter: IFilter) => void;
 };
 
 const HeaderPage: FC<IHeaderProps> = (props) => {
-  const {
-    handleType,
-    type,
-    title,
-    allData,
-    handleSearchInput,
-    handleDeleteTitle,
-    handleStatus,
-    status,
-    handleDeleteType,
-    handleAllDelete,
-    handleDeleteStatus,
-  } = props;
-  const totalItem = allData.pagination.items.total;
+  const { setAllData, alldata, setLoading, row, OnFilter } = props;
+  const [type, setType] = useState<string | null>(""); // this is type of like tv and other ...
+  const [title, setTitle] = useState(""); // this is search field (input field)...
+  const [status, setStatus] = useState<string | null>("");
+  const [debounced] = useDebouncedValue(title, 1000);
+
+  const filterArguments = {
+    type: type,
+    title: title,
+  };
+
+  useEffect(() => {
+    OnFilter(filterArguments);
+  }, [type, title]);
+
+  useEffect(() => {
+    const debouncefunc = async () => {
+      const res = await apiData(Number(row) | 5, type, title);
+      setAllData(res);
+    };
+    debouncefunc();
+  }, [debounced]);
+
+  const handleDeleteType = () => {
+    setType("");
+    setAllData(alldata);
+  };
+
+  const handleDeleteTitle = () => {
+    setTitle("");
+    setAllData(alldata);
+  };
+
+  const handleDeleteStatus = () => {
+    setStatus("");
+    setAllData(alldata);
+  };
+
+  const handleAllDelete = () => {
+    setType("");
+    setTitle("");
+    setStatus("");
+    setAllData(alldata);
+  };
+
+  const handleType = async (value: string | null) => {
+    setType(value);
+    setLoading(true);
+    const res = await apiData(Number(row) | 5, value);
+    setLoading(false);
+    setAllData(res);
+  };
+
+  const handleSearchInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoading(true);
+    setTitle(e.target.value);
+    setLoading(false);
+  };
+
+  const handleStatus = async (value: string | null) => {
+    setStatus(value);
+    setLoading(true);
+    const res = await apiData(
+      Number(row) | 5,
+      type,
+      title,
+      null,
+      "",
+      "",
+      value
+    );
+    setLoading(false);
+    setAllData(res);
+  };
+
+  const totalItem = alldata.pagination.items.total;
 
   return (
     <>
@@ -56,11 +120,9 @@ const HeaderPage: FC<IHeaderProps> = (props) => {
             { label: "Tv special", value: "tv_special" },
           ]}
         />
-        <Input
-          value={title}
+        <BaseInput
           onChange={(e) => handleSearchInput(e)}
-          classNames={{ input: "!h-12 !rounded-2xl" }}
-          placeholder="Search anything.."
+          placeholder="Search Anthing..."
           leftSection={<FaSearch />}
         />
         <BaseSelect
