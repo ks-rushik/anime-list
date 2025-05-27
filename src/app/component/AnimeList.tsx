@@ -2,7 +2,8 @@
 import React, { FC, useState } from "react";
 
 import TableData from "@/app/component/TableData";
-import FilterFields, { IFilter } from "@/app/component/FilterFields";
+import { IFilter } from "@/app/component/FilterFields";
+import FilterFields from "@/app/component/FilterFields";
 
 export type IData = {
   data: {
@@ -38,6 +39,8 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
   const [rowValue, setRowValue] = useState<string | null>("");
   const [loading, setLoading] = useState(false);
 
+  const totalItem = allData.pagination.items.total;
+
   const handleFilterValues = (values: IFilter) => {
     setFilterValues(values);
   };
@@ -50,6 +53,7 @@ const AnimeList: FC<IAnimeListProps> = (props) => {
     <div className="mx-10">
       <FilterFields
         alldata={alldata}
+        totalItem={totalItem}
         setAllData={setAllData}
         setLoading={setLoading}
         row={rowValue}
