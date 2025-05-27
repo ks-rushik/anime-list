@@ -3,12 +3,12 @@ import BaseSelect from "@/app/component/ui/BaseSelect";
 import { IData } from "@/app/component/AnimeList";
 import { FaSearch } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import FieldWithValueWrapper from "@/app/component/FieldWithValueWrapper";
 import { useDebouncedValue } from "@mantine/hooks";
 import { apiData } from "@/app/anime/page";
 import BaseInput from "@/app/component/ui/BaseInput";
 import { mediaType } from "@/app/constant/mediaType";
 import { statusType } from "@/app/constant/statusType";
+import FieldWithDeleteButton from "@/app/component/FieldWithDeleteButton";
 
 export type IFilter = {
   type: string | null;
@@ -131,21 +131,21 @@ const FilterFields: FC<IHeaderProps> = (props) => {
 
       <div className="my-6 flex flex-row text-center items-center gap-12">
         {type && (
-          <FieldWithValueWrapper
+          <FieldWithDeleteButton
             title={"Type"}
             value={type!}
             handleDelete={handleDeleteType}
           />
         )}
         {title && (
-          <FieldWithValueWrapper
+          <FieldWithDeleteButton
             title={"Title"}
             value={title}
             handleDelete={handleDeleteTitle}
           />
         )}
         {status && (
-          <FieldWithValueWrapper
+          <FieldWithDeleteButton
             title={"Status"}
             value={status!}
             handleDelete={handleDeleteStatus}

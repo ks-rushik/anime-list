@@ -1,13 +1,13 @@
 import React, { FC } from "react";
 import { MdClear } from "react-icons/md";
 
-export type IFieldWithValueWrapperProps = {
+export type IFieldWithDeleteButtonProps = {
   title: string;
   value: string ;
   handleDelete: () => void;
 };
 
-const FieldWithValueWrapper: FC<IFieldWithValueWrapperProps> = (props) => {
+const FieldWithDeleteButton: FC<IFieldWithDeleteButtonProps> = (props) => {
   const { title, value, handleDelete } = props;
   return (
     <div className="flex flex-row items-center">
@@ -23,4 +23,4 @@ const FieldWithValueWrapper: FC<IFieldWithValueWrapperProps> = (props) => {
   );
 };
 
-export default FieldWithValueWrapper;
+export default FieldWithDeleteButton;
