@@ -17,14 +17,15 @@ export type IFilter = {
 
 export type IHeaderProps = {
   alldata: IData;
-  setAllData: React.Dispatch<React.SetStateAction<IData>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   row: string | null;
   OnFilter: (filter: IFilter) => void;
+  setAllData: React.Dispatch<React.SetStateAction<IData>>;
+  totalItem: number;
 };
 
 const FilterFields: FC<IHeaderProps> = (props) => {
-  const { setAllData, alldata, setLoading, row, OnFilter } = props;
+  const { setAllData, alldata, setLoading, row, OnFilter, totalItem } = props;
   const [type, setType] = useState<string | null>(""); // this is type of like tv and other ...
   const [title, setTitle] = useState(""); // this is search field (input field)...
   const [status, setStatus] = useState<string | null>("");
@@ -41,8 +42,10 @@ const FilterFields: FC<IHeaderProps> = (props) => {
 
   useEffect(() => {
     const debouncefunc = async () => {
-      const res = await apiData(Number(row) | 5, type, title);
-      setAllData(res);
+      if (debounced.trim() !== "" || debounced === "") {
+        const res = await apiData(Number(row) | 5, type, title);
+        setAllData(res);
+      }
     };
     debouncefunc();
   }, [debounced]);
@@ -99,8 +102,6 @@ const FilterFields: FC<IHeaderProps> = (props) => {
     setAllData(res);
   };
 
-  const totalItem = alldata.pagination.items.total;
-
   return (
     <>
       <div className="flex items-center py-10 gap-4">
@@ -133,11 +134,11 @@ const FilterFields: FC<IHeaderProps> = (props) => {
         {type && (
           <FieldWithDeleteButton
             title={"Type"}
-            value={type!}
+            value={type}
             handleDelete={handleDeleteType}
           />
         )}
-        {title && (
+        {title.trim() && (
           <FieldWithDeleteButton
             title={"Title"}
             value={title}
@@ -151,7 +152,7 @@ const FilterFields: FC<IHeaderProps> = (props) => {
             handleDelete={handleDeleteStatus}
           />
         )}
-        {type || title || status ? (
+        {type || title.trim() || status ? (
           <div>
             <MdDeleteOutline size={22} onClick={handleAllDelete} color="red" />
           </div>
