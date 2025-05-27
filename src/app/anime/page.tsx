@@ -25,8 +25,6 @@ export const apiData = async (
     const response = await axios.get(api, { params });
     return response.data;
   } catch (error) {
-    console.log(error);
-
     if (error instanceof AxiosError) {
       if (error.code === "ERR_BAD_REQUEST") {
         throw new Error(
