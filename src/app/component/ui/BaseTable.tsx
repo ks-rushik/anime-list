@@ -1,0 +1,137 @@
+import {
+  Pagination,
+  Table,
+  TableProps,
+  TableStylesNames,
+  TableTbody,
+  TableTd,
+  TableTh,
+  TableThead,
+  TableTr,
+} from "@mantine/core";
+import clsx from "clsx";
+import React, { ReactNode } from "react";
+import BaseSelect from "@/app/component/ui/BaseSelect";
+import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+
+export type IPagination = {
+  handleRow: (value: string | null) => Promise<void>;
+  handlePageChange: (newPage: number) => Promise<void>;
+  currentPage: number;
+};
+export type IColumn<T> = {
+  label: string;
+  render: (item: T) => ReactNode;
+  sortable?: {
+    upFunc: Promise<void>;
+    downFunc: Promise<void>;
+  };
+};
+
+export type IData<T> = {
+  data: T[];
+  pagination: {
+    current_page: number;
+    has_next_page: boolean;
+    items: { count: number; total: number; per_page: number };
+    last_visible_page: number;
+  };
+};
+
+export type IBaseTableProps<T> = TableProps & {
+  classNames?: Partial<Record<TableStylesNames, string>>;
+  columns: IColumn<T>[];
+  data: IData<T>;
+  pagination?: IPagination | undefined;
+};
+
+const BaseTable = <T,>({
+  classNames,
+  columns,
+  data,
+  pagination,
+  ...other
+}: IBaseTableProps<T>) => {
+  console.log(columns, "this is data ");
+
+  const startItem = pagination
+    ? (pagination.currentPage - 1) * data.pagination.items.count
+    : 0;
+
+  const endItem = startItem + (data.pagination.items.per_page || 0) - 1;
+
+  const totalPages = data.pagination.last_visible_page;
+
+  return (
+    <>
+      <Table
+        {...other}
+        classNames={{
+          ...classNames,
+          thead: clsx("text-gray-600 text-base bg-gray-200", classNames?.thead),
+        }}
+      >
+        <TableThead>
+          <TableTr>
+            {columns.map((col, index) => (
+              <React.Fragment key={index}>
+                {col.sortable ? (
+                  <TableTh>
+                    <div className="flex items-center gap-2">
+                      <span>{col.label}</span>
+                      <div className="flex">
+                        <button className="disabled:opacity-30">
+                          <FaArrowUp
+                            onClick={() => col.sortable?.upFunc}
+                            size={14}
+                          />
+                        </button>
+                        <button className="disabled:opacity-30">
+                          <FaArrowDown
+                            onClick={() => col.sortable?.downFunc}
+                            size={14}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </TableTh>
+                ) : (
+                  <TableTh>{col.label}</TableTh>
+                )}
+              </React.Fragment>
+            ))}
+          </TableTr>
+        </TableThead>
+        <TableTbody>
+          {data.data.map((row, index) => (
+            <TableTr key={index}>
+              {columns.map((col, index) => (
+                <TableTd key={index}>{col.render(row)}</TableTd>
+              ))}
+            </TableTr>
+          ))}
+        </TableTbody>
+      </Table>
+      {pagination && (
+        <div className="py-12 flex flex-row justify-end gap-6 items-center-safe">
+          <BaseSelect
+            data={["5", "10", "15", "20"]}
+            onChange={(value) => pagination.handleRow(value)}
+            defaultValue={"5"}
+          />
+          <div>
+            {startItem} - {endItem} of {totalPages}
+          </div>
+          <Pagination
+            total={totalPages}
+            value={pagination.currentPage}
+            onChange={pagination.handlePageChange}
+            radius={"xl"}
+          />
+        </div>
+      )}
+    </>
+  );
+};
+
+export default BaseTable;

@@ -1,7 +1,8 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import {
   Badge,
   Loader,
+  Pagination,
   Table,
   TableTbody,
   TableTd,
@@ -13,18 +14,45 @@ import OrderingWrapper from "@/app/component/OrderingWrapper";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import { apiData } from "@/app/anime/page";
 import { IData } from "@/app/component/AnimeList";
+import BaseSelect from "@/app/component/ui/BaseSelect";
+import { IFilter } from "@/app/component/HeaderPage";
+import BaseTable from "@/app/component/ui/BaseTable";
 
 export type ITableProps = {
   setAllData: (value: React.SetStateAction<IData>) => void;
   allData: IData;
-  row: string | null;
   type: string | null;
   title: string | undefined;
   loading: boolean;
+  OnRow: (row: string | null) => void;
+  filterValues: IFilter;
 };
 
 const TableData: FC<ITableProps> = (props) => {
-  const { setAllData, row, type, title, loading, allData } = props;
+  const { setAllData, type, title, loading, allData, OnRow, filterValues } =
+    props;
+  const [row, setRow] = useState<string | null>(""); // this is rows like 5 ,10 , 15 ,...
+  const [currentPage, setCurrentPage] = useState(
+    allData.pagination.current_page
+  ); // this is used for set current page...
+
+  const handlePageChange = async (newPage: number) => {
+    const res = await apiData(
+      Number(row) || 5,
+      filterValues.type,
+      filterValues.title,
+      newPage
+    );
+    setAllData(res);
+    setCurrentPage(newPage);
+  };
+
+  const handleRow = async (value: string | null) => {
+    setRow(value);
+    const res = await apiData(Number(value), filterValues.type);
+    setAllData(res);
+  };
+
   const [titleOrder, setTitleOrder] = useState<{
     sort: string | null;
     orderBy: string | null;
@@ -34,6 +62,16 @@ const TableData: FC<ITableProps> = (props) => {
     sort: string | null;
     orderBy: string | null;
   }>({ sort: "", orderBy: "" }); // this is rank order state for disabled up and down button
+
+  const startItem = (currentPage - 1) * allData.pagination.items.count;
+
+  const endItem = startItem + (allData.pagination.items.per_page || 0) - 1;
+
+  const totalPages = allData.pagination.last_visible_page;
+
+  useEffect(() => {
+    OnRow(row);
+  }, [row]);
 
   const fetchWithOrder = async (
     orderBy: string | null,
@@ -89,7 +127,7 @@ const TableData: FC<ITableProps> = (props) => {
 
   return (
     <>
-      <Table classNames={{ thead: "text-gray-600 text-base bg-gray-200" }}>
+      {/* <Table classNames={{ thead: "text-gray-600 text-base bg-gray-200" }}>
         <TableThead>
           <TableTr>
             <TableTh>
@@ -140,6 +178,45 @@ const TableData: FC<ITableProps> = (props) => {
         </TableThead>
         <TableTbody>{rows}</TableTbody>
       </Table>
+
+      <div className="py-12 flex flex-row justify-end gap-6 items-center-safe">
+        <BaseSelect
+          data={["5", "10", "15", "20"]}
+          onChange={(value) => handleRow(value)}
+          defaultValue={"5"}
+        />
+        <div>
+          {startItem} - {endItem} of {totalPages}
+        </div>
+        <Pagination
+          total={totalPages}
+          value={currentPage}
+          onChange={handlePageChange}
+          radius={"xl"}
+        />
+      </div> */}
+
+      <BaseTable
+        data={allData}
+        columns={[
+          {
+            label: "Title",
+            render: (item) => item.title,
+          
+          },
+          {
+            label: "Rank",
+            render: (item) => item.rank,
+          },
+          { label: "Type", render: (item) => item.type },
+          { label: "Status", render: (item) => <Badge>{item.status}</Badge> },
+        ]}
+        pagination={{
+          handlePageChange,
+          handleRow,
+          currentPage,
+        }}
+      />
     </>
   );
 };
