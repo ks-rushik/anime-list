@@ -1,4 +1,5 @@
 import {
+  Loader,
   Pagination,
   Table,
   TableProps,
@@ -46,6 +47,7 @@ export type IBaseTableProps<T> = TableProps & {
   columns: IColumn<T>[];
   data: IData<T>;
   pagination?: IPagination | undefined;
+  loading: boolean;
 };
 
 const BaseTable = <T,>({
@@ -53,11 +55,13 @@ const BaseTable = <T,>({
   columns,
   data,
   pagination,
+  loading,
   ...other
 }: IBaseTableProps<T>) => {
   const perPage = data.pagination.items.per_page || 5;
   const totalItems = data.pagination.items.total || 0;
   const currentPage = pagination?.currentPage || 1;
+  console.log(data.pagination, "this is pagination ");
 
   const startItem =
     totalItems === 0
@@ -71,6 +75,7 @@ const BaseTable = <T,>({
   const totalPages = data.pagination.last_visible_page;
 
   const totalItem = data.pagination.items.total;
+  
 
   return (
     <>
@@ -126,6 +131,14 @@ const BaseTable = <T,>({
               <TableTd colSpan={columns.length}>
                 <div className="text-base text-gray-700 flex items-center justify-center py-10">
                   No data found
+                </div>
+              </TableTd>
+            </TableTr>
+          ) : loading ? (
+            <TableTr>
+              <TableTd colSpan={4}>
+                <div className="flex items-center justify-center py-10">
+                  <Loader color="blue" type="dots" />
                 </div>
               </TableTd>
             </TableTr>
