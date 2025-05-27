@@ -10,17 +10,18 @@ export const apiData = async (
   sort?: string | null,
   status?: string | null
 ) => {
-  const url = new URL("https://api.jikan.moe/v4/anime");
+  const api = "https://api.jikan.moe/v4/anime";
+  const params: Record<string, string> = {};
 
-  if (limit) url.searchParams.append("limit", limit.toString());
-  if (filterData) url.searchParams.append("type", filterData);
-  if (title) url.searchParams.append("q", title);
-  if (page) url.searchParams.append("page", page.toString());
-  if (order) url.searchParams.append("order_by", order);
-  if (sort) url.searchParams.append("sort", sort);
-  if (status) url.searchParams.append("status", status);
+  if (limit) params.limit = limit.toString();
+  if (filterData) params.type = filterData;
+  if (title) params.q = title;
+  if (page) params.page = page.toString();
+  if (order) params.order_by = order;
+  if (sort) params.sort = sort;
+  if (status) params.status = status;
 
-  const response = await axios.get(url.toString());
+  const response = await axios.get(api, { params });
   return response.data;
 };
 
