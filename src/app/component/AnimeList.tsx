@@ -1,9 +1,11 @@
 "use client";
-import React, { FC, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import TableData from "@/app/component/TableData";
 import { IFilter } from "@/app/component/FilterFields";
 import FilterFields from "@/app/component/FilterFields";
+import { useQuery } from "@tanstack/react-query";
+import { apiData } from "../anime/page";
 
 export type IData = {
   data: {
@@ -25,47 +27,69 @@ export type IData = {
   };
 };
 
-export type IAnimeListProps = {
-  alldata: IData;
-};
-
-const AnimeList: FC<IAnimeListProps> = (props) => {
-  const { alldata } = props;
-  const [allData, setAllData] = useState(alldata);
+const AnimeList = () => {
   const [filterValues, setFilterValues] = useState<IFilter>({
     type: "",
     title: "",
+    status: "",
   });
   const [rowValue, setRowValue] = useState<string | null>("");
-  const [loading, setLoading] = useState(false);
-  const [currentPage ,setCurrentPage] = useState<number | undefined>()
+  const [currentPage, setCurrentPage] = useState<number | undefined>();
+  const [allData, setAllData] = useState<IData | null>(null); // initially null
 
-  const totalItem = allData.pagination.items.total;
+  const { data, isLoading } = useQuery<IData>({
+    queryKey: [
+      "anime",
+      rowValue,
+      filterValues.type,
+      filterValues.title,
+      currentPage,
+      filterValues.status,
+    ],
+    queryFn: async () =>
+      await apiData(
+        Number(rowValue) | 5,
+        filterValues.type,
+        filterValues.title,
+        currentPage,
+        "",
+        "",
+        filterValues.status
+      ),
+  });
+
+  useEffect(() => {
+    if (data) {
+      setAllData(data);
+    }
+  }, [data]);
 
   const handleFilterValues = (values: IFilter) => {
     setFilterValues(values);
   };
 
-  const handleRow = (row: string | null ,currentPage: number) => {
+  const handleRow = (row: string | null, currentPage: number) => {
     setRowValue(row);
-    setCurrentPage(currentPage)
+    setCurrentPage(currentPage);
   };
+
+  if (!allData) {
+    return <div className="text-center mt-20">Loading anime list...</div>;
+  }
+
+  const totalItem = allData.pagination.items.total;
 
   return (
     <div className="mx-10">
       <FilterFields
-        alldata={alldata}
         totalItem={totalItem}
-        setAllData={setAllData}
-        setLoading={setLoading}
         row={rowValue}
         currentPage={currentPage}
         OnFilter={handleFilterValues}
       />
       <TableData
         allData={allData}
-        loading={loading}
-        setAllData={setAllData}
+        loading={isLoading}
         type={filterValues.type}
         title={filterValues.title}
         OnRow={handleRow}
