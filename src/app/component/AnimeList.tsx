@@ -5,7 +5,8 @@ import TableData from "@/app/component/TableData";
 import { IFilter } from "@/app/component/FilterFields";
 import FilterFields from "@/app/component/FilterFields";
 import { useQuery } from "@tanstack/react-query";
-import { apiData } from "../anime/page";
+import { apiData } from "@/app/anime/page";
+import { ISort } from "@/app/component/ui/BaseTable";
 
 export type IData = {
   data: {
@@ -35,25 +36,19 @@ const AnimeList = () => {
   });
   const [rowValue, setRowValue] = useState<string | null>("");
   const [currentPage, setCurrentPage] = useState<number | undefined>();
-  const [allData, setAllData] = useState<IData | null>(null); // initially null
+  const [sortOrder, setSortOrder] = useState<ISort>({ column: "", sort: "" });
+  const [allData, setAllData] = useState<IData | null>(null);
 
   const { data, isLoading } = useQuery<IData>({
-    queryKey: [
-      "anime",
-      rowValue,
-      filterValues.type,
-      filterValues.title,
-      currentPage,
-      filterValues.status,
-    ],
+    queryKey: ["anime", rowValue, filterValues, currentPage, sortOrder],
     queryFn: async () =>
       await apiData(
         Number(rowValue) | 5,
         filterValues.type,
         filterValues.title,
         currentPage,
-        "",
-        "",
+        sortOrder.column,
+        sortOrder.sort,
         filterValues.status
       ),
   });
@@ -68,9 +63,14 @@ const AnimeList = () => {
     setFilterValues(values);
   };
 
-  const handleRow = (row: string | null, currentPage: number) => {
+  const handleTableData = (
+    row: string | null,
+    currentPage: number,
+    sortingOrder: ISort
+  ) => {
     setRowValue(row);
     setCurrentPage(currentPage);
+    setSortOrder(sortingOrder);
   };
 
   if (!allData) {
@@ -81,19 +81,11 @@ const AnimeList = () => {
 
   return (
     <div className="mx-10">
-      <FilterFields
-        totalItem={totalItem}
-        row={rowValue}
-        currentPage={currentPage}
-        OnFilter={handleFilterValues}
-      />
+      <FilterFields totalItem={totalItem} OnFilter={handleFilterValues} />
       <TableData
         allData={allData}
         loading={isLoading}
-        type={filterValues.type}
-        title={filterValues.title}
-        OnRow={handleRow}
-        filterValues={filterValues}
+        OnTable={handleTableData}
       />
     </div>
   );

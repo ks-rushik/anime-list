@@ -3,7 +3,6 @@ import BaseSelect from "@/app/component/ui/BaseSelect";
 import { FaSearch } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { useDebouncedValue } from "@mantine/hooks";
-import { apiData } from "@/app/anime/page";
 import BaseInput from "@/app/component/ui/BaseInput";
 import { mediaType } from "@/app/constant/mediaType";
 import { statusType } from "@/app/constant/statusType";
@@ -16,37 +15,26 @@ export type IFilter = {
 };
 
 export type IHeaderProps = {
-  row: string | null;
   OnFilter: (filter: IFilter) => void;
   totalItem: number;
-  currentPage: number | undefined;
 };
 
 const FilterFields: FC<IHeaderProps> = (props) => {
-  const { row, OnFilter, totalItem, currentPage } = props;
+  const { OnFilter, totalItem } = props;
   const [type, setType] = useState<string | null>(""); // this is type of like tv and other ...
   const [title, setTitle] = useState(""); // this is search field (input field)...
   const [status, setStatus] = useState<string | null>("");
-  const [debounced] = useDebouncedValue(title, 1000);
+  const [debounced] = useDebouncedValue(title, 500);
 
   const filterArguments = {
     type: type,
-    title: title,
+    title: debounced.trim(),
     status: status,
   };
 
   useEffect(() => {
     OnFilter(filterArguments);
-  }, [type, title, status]);
-
-  // useEffect(() => {
-  //   const debouncefunc = async () => {
-  //     if (debounced.trim() !== "" || debounced === "") {
-  //       const res = await apiData(Number(row) | 5, type, title, currentPage);
-  //     }
-  //   };
-  //   debouncefunc();
-  // }, [debounced]);
+  }, [type, debounced, status]);
 
   const handleDeleteType = () => {
     setType("");
