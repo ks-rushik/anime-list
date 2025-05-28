@@ -43,7 +43,7 @@ const AnimeList = () => {
     queryKey: ["anime", rowValue, filterValues, currentPage, sortOrder],
     queryFn: async () =>
       await apiData(
-        Number(rowValue) | 5,
+        Number(rowValue) || 5,
         filterValues.type,
         filterValues.title,
         currentPage,

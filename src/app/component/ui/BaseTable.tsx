@@ -62,10 +62,7 @@ const BaseTable = <T,>({
   const totalItems = data.pagination.items.total || 0;
   const currentPage = pagination?.currentPage || 1;
 
-  const startItem =
-    totalItems === 0
-      ? (currentPage - 1) * perPage
-      : (currentPage - 1) * perPage + 1;
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * perPage + 1;
   const endItem = Math.min(
     startItem === 0 ? 0 : startItem + (data.pagination.items.count || 0) - 1,
     totalItems
