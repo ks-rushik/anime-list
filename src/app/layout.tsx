@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@mantine/core/styles.css";
 import { MantineProvider } from "@mantine/core";
-import Provider from "@/app/component/Provider";
+import Provider from "@/app/component/QueryClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
