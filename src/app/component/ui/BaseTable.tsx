@@ -11,7 +11,7 @@ import {
   TableTr,
 } from "@mantine/core";
 import clsx from "clsx";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import BaseSelect from "@/app/component/ui/BaseSelect";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 
@@ -124,19 +124,19 @@ const BaseTable = <T,>({
           </TableTr>
         </TableThead>
         <TableTbody>
-          {data.data.length === 0 ? (
+          {loading ? (
+            <TableTr>
+              <TableTd colSpan={columns.length}>
+                <div className="flex items-center justify-center py-10">
+                  <Loader color="blue" type="dots" />
+                </div>
+              </TableTd>
+            </TableTr>
+          ) : data.data.length === 0 ? (
             <TableTr>
               <TableTd colSpan={columns.length}>
                 <div className="text-base text-gray-700 flex items-center justify-center py-10">
                   No data found
-                </div>
-              </TableTd>
-            </TableTr>
-          ) : loading ? (
-            <TableTr>
-              <TableTd colSpan={4}>
-                <div className="flex items-center justify-center py-10">
-                  <Loader color="blue" type="dots" />
                 </div>
               </TableTd>
             </TableTr>

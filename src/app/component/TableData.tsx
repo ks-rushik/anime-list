@@ -7,7 +7,6 @@ import { IFilter } from "@/app/component/FilterFields";
 import BaseTable, { ISort } from "@/app/component/ui/BaseTable";
 
 export type ITableProps = {
-  setAllData: (value: React.SetStateAction<IData>) => void;
   allData: IData;
   type: string | null;
   title: string | undefined;
@@ -17,8 +16,9 @@ export type ITableProps = {
 };
 
 const TableData: FC<ITableProps> = (props) => {
-  const { setAllData, type, title, loading, allData, OnRow, filterValues } =
-    props;
+  const { type, title, loading, allData, OnRow, filterValues } = props;
+  console.log(allData, "this is allData");
+
   const [row, setRow] = useState<string | null>(""); // this is rows like 5 ,10 , 15 ,...
   const [currentPage, setCurrentPage] = useState(
     allData.pagination.current_page
@@ -29,25 +29,11 @@ const TableData: FC<ITableProps> = (props) => {
   });
 
   const handlePageChange = async (newPage: number) => {
-    const res = await apiData(
-      Number(row),
-      filterValues.type,
-      filterValues.title,
-      newPage
-    );
-    setAllData(res);
     setCurrentPage(newPage);
   };
 
   const handleRow = async (value: string | null) => {
     setRow(value);
-    const res = await apiData(
-      Number(value),
-      filterValues.type,
-      filterValues.title,
-      currentPage
-    );
-    setAllData(res);
   };
   const fetchWithOrder = async (
     orderBy: string | null,
@@ -61,7 +47,7 @@ const TableData: FC<ITableProps> = (props) => {
       orderBy,
       sort
     );
-    setAllData(res);
+    // setAllData(res);
   };
 
   useEffect(() => {
