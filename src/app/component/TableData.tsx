@@ -1,24 +1,23 @@
 import React, { FC, useEffect, useState } from "react";
 import { Badge } from "@mantine/core";
 
-import { apiData } from "@/app/anime/page";
 import { IData } from "@/app/component/AnimeList";
-import { IFilter } from "@/app/component/FilterFields";
 import BaseTable, { ISort } from "@/app/component/ui/BaseTable";
 
 export type ITableProps = {
-  setAllData: (value: React.SetStateAction<IData>) => void;
   allData: IData;
-  type: string | null;
-  title: string | undefined;
+
   loading: boolean;
-  OnRow: (row: string | null, currentPage: number) => void;
-  filterValues: IFilter;
+  OnTable: (
+    row: string | null,
+    currentPage: number,
+    sortingOrder: ISort
+  ) => void;
 };
 
 const TableData: FC<ITableProps> = (props) => {
-  const { setAllData, type, title, loading, allData, OnRow, filterValues } =
-    props;
+  const { loading, allData, OnTable } = props;
+
   const [row, setRow] = useState<string | null>(""); // this is rows like 5 ,10 , 15 ,...
   const [currentPage, setCurrentPage] = useState(
     allData.pagination.current_page
@@ -29,44 +28,16 @@ const TableData: FC<ITableProps> = (props) => {
   });
 
   const handlePageChange = async (newPage: number) => {
-    const res = await apiData(
-      Number(row),
-      filterValues.type,
-      filterValues.title,
-      newPage
-    );
-    setAllData(res);
     setCurrentPage(newPage);
   };
 
   const handleRow = async (value: string | null) => {
     setRow(value);
-    const res = await apiData(
-      Number(value),
-      filterValues.type,
-      filterValues.title,
-      currentPage
-    );
-    setAllData(res);
-  };
-  const fetchWithOrder = async (
-    orderBy: string | null,
-    sort: string | null
-  ) => {
-    const res = await apiData(
-      Number(row) | 5,
-      type,
-      title,
-      null,
-      orderBy,
-      sort
-    );
-    setAllData(res);
   };
 
   useEffect(() => {
-    OnRow(row, currentPage);
-  }, [row]);
+    OnTable(row, currentPage, sortingOrder);
+  }, [row, currentPage, sortingOrder]);
 
   return (
     <>
@@ -84,11 +55,9 @@ const TableData: FC<ITableProps> = (props) => {
             render: (item) => item.title,
             sortable: {
               upFunc: () => {
-                fetchWithOrder("title", "asc");
                 setSortingOrder({ column: "Title", sort: "asc" });
               },
               downFunc: () => {
-                fetchWithOrder("title", "desc");
                 setSortingOrder({ column: "Title", sort: "desc" });
               },
               sortingOrder: sortingOrder,
@@ -99,11 +68,9 @@ const TableData: FC<ITableProps> = (props) => {
             render: (item) => item.rank,
             sortable: {
               upFunc: () => {
-                fetchWithOrder("rank", "asc");
                 setSortingOrder({ column: "Rank", sort: "asc" });
               },
               downFunc: () => {
-                fetchWithOrder("rank", "desc");
                 setSortingOrder({ column: "Rank", sort: "desc" });
               },
               sortingOrder: sortingOrder,

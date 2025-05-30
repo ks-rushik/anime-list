@@ -38,11 +38,9 @@ export const apiData = async (
 };
 
 const page = async () => {
-  const allData = await apiData(5);
-
   return (
     <>
-      <AnimeList alldata={allData} />
+      <AnimeList />
     </>
   );
 };
